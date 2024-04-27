@@ -71,6 +71,19 @@ export const getGitCommitFromDiff = async ( ) =>{
   
   const SYSTEM_PROMPT = ` ${IDENTITY} Your mission is to create clean and comprehensive commit messages as per the conventional commit convention and explain WHAT were the changes and mainly WHY the changes were done. I'll send you an output of 'git diff --staged' command, and you are to convert it into a commit message. Do not preface the commit with anything. Conventional commit keywords: fix, feat, build, chore, ci, docs, style, refactor, perf, test. Add a short description of WHY the changes are done after the commit message. Don\'t start it with "This commit", just describe the changes.  Use the present tense. Lines must not be longer than 74 characters. Use English for the commit message.` 
 
+
+  if(!model){
+    p.outro(`Select a model before procceding.`);
+    await prompt();
+    return;
+  }
+  if(!apiKey){
+    p.outro(`Add an API Key before procceding.`);
+    await prompt();
+    return;
+  }
+  
+
   const { stdout: diff } = await execa('git', [
     'diff',
     '--staged',
@@ -87,18 +100,11 @@ export const getGitCommitFromDiff = async ( ) =>{
     ]);
   }
 
-  
-  if(!model){
-    p.outro(`Select a model before procceding.`);
-    await prompt();
-    return;
-  }
-  if(!apiKey){
-    p.outro(`Add an API Key before procceding.`);
-    await prompt();
-    return;
+  if (shouldStage){
+    p.outro('Changes Stagged!');
   }
   
+
   const res = await groq.chat.completions.create({
     messages: [
       {
@@ -125,7 +131,10 @@ export const getGitCommitFromDiff = async ( ) =>{
       '-m',
       res
     ]);
-    
+  }
+
+  if (shouldCommit){
+    p.outro('Changes commited!');
   }
   
 }
