@@ -1,9 +1,8 @@
 #!/usr/bin/env node
-import { intro, spinner } from "@clack/prompts";
+import { intro, outro, spinner } from "@clack/prompts";
 import { getGitCommitFromDiff, prompt } from "./lib.js";
-import { execa } from 'execa';
 import { program } from "commander";
-// import packageJSON from '../package.json';
+import { apiKey, config, model } from "./utils.js";
 
 
 
@@ -14,6 +13,15 @@ program.version('0.0.1').description('AI Git Commit CLI');
 program.action( async() => {
   const s = spinner();
   s.start('Thinking...');
+
+  if(!apiKey){
+    outro('Please set your GROQ API Key first!');
+    process.exit(0);
+  }
+  if(!model){
+    outro('Please set your GROQ Model first!');
+    process.exit(0);
+  }
   
   await getGitCommitFromDiff();
   
