@@ -105,6 +105,11 @@ export const getGitCommitFromDiff = async ( ) =>{
   }
   
 
+  if(diff){
+    p.outro('No changes to commit!');
+    return;
+  }
+
   const res = await groq.chat.completions.create({
     messages: [
       {
