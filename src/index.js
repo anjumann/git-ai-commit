@@ -16,7 +16,7 @@ program.action( async() => {
   
   await getGitCommitFromDiff();
   
-  s.stop('Done!');
+  s.stop('Done!\n');
   
 });
 
