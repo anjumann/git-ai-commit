@@ -76,10 +76,17 @@ export const getGitCommitFromDiff = async ( ) =>{
     '--staged',
   ]);
 
-  await execa('git', [
-    'add',
-    '.'
-  ]);
+  const shouldStage = await confirm({
+    message: 'Do you want Stage the changes?',
+  });
+
+  if (shouldStage){
+    await execa('git', [
+      'add',
+      '.'
+    ]);
+  }
+
   
   if(!model){
     p.outro(`Select a model before procceding.`);
@@ -91,7 +98,7 @@ export const getGitCommitFromDiff = async ( ) =>{
     await prompt();
     return;
   }
-
+  
   const res = await groq.chat.completions.create({
     messages: [
       {
@@ -107,12 +114,18 @@ export const getGitCommitFromDiff = async ( ) =>{
   }).then((res) => res.choices[0]?.message?.content ).catch((err) => console.error(err));
   
   console.log(res);
-
-  await execa('git', [
-    'commit',
-    '-m',
-    res
-  ]);
   
+  const shouldCommit = await confirm({
+    message: 'Do you want to commit the changes?',
+  });
+
+  if (shouldCommit) {    
+    await execa('git', [
+      'commit',
+      '-m',
+      res
+    ]);
+    
+  }
   
 }
